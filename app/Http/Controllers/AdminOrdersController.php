@@ -44,7 +44,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $this->form = [];
         $this->form[] = ['label' => 'User', 'name' => 'user_id', 'type' => 'hidden', 'value' => CRUDBooster::myId(), 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10', 'datatable' => 'cms_users,id'];
         //$this->form[] = ['label'=>'Cliente','name'=>'cliente_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'clientes,id','datatable_format'=>'username,\' | \',name,\' | \',last_name'];
-        $this->form[] = ['label' => 'Cliente', 'name' => 'cliente_id', 'type' => 'datamodal', 'validation' => 'required|integer|min:0' ,'datamodal_table' => 'clientes', 'datamodal_where' => '', 'datamodal_columns' => 'first_name,last_name,username', 'datamodal_select_to' => 'id:cliente_id'];
+        $this->form[] = ['label' => 'Cliente', 'name' => 'cliente_id', 'type' => 'datamodal', 'validation' => 'required|integer|min:0', 'datamodal_table' => 'clientes', 'datamodal_where' => '', 'datamodal_columns' => 'first_name,last_name,username', 'datamodal_select_to' => 'id:cliente_id'];
         $this->form[] = ['label' => 'Tarjeta', 'name' => 'tarjeta_id', 'type' => 'select', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10', 'datatable' => 'tarjetas,numero_tarj', 'parent_select' => 'cliente_id'];
         $this->form[] = ['label' => 'Total', 'name' => 'total', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
         # END FORM DO NOT REMOVE THIS LINE
@@ -60,7 +60,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         //Alert::warning('this is warning alert');
 
 
-       // Alert::message('---Robots are working!');
+        // Alert::message('---Robots are working!');
 
         //$this->button_save = false;
         /*
@@ -114,7 +114,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         |
         */
         $this->alert = array();
-       // $this->alert[] = ['message' => 'Your message goes here...', 'type' => 'info'];
+        // $this->alert[] = ['message' => 'Your message goes here...', 'type' => 'info'];
 
 
         /*
@@ -161,9 +161,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         |
         */
         $this->script_js = NULL;
-       /* $this->script_js = "    $(function() {
-        swal('Test Script');
-        })";*/
+        /* $this->script_js = "    $(function() {
+         swal('Test Script');
+         })";*/
 
 
         /*
@@ -287,9 +287,24 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     */
     public function hook_after_add($id)
     {
-        //Your code here
-        $this->script_js = "    $(function() {
-        swal('Test Script--');})";
+        //dd($id);
+        $carbon = new \Carbon\Carbon();
+        $date = $carbon->now('America/Bogota');
+        $date=$date->format('m');
+        //dd($date);
+        $cliente=DB::table(orders)->where('id',$id)->get();
+       //  dd($cliente[0]->cliente_id);
+        $datos = DB::table(orders)->join('clientes','orders.cliente_id','=','clientes.id')->where('cliente_id', $cliente[0]->cliente_id)->whereMonth('orders.created_at',$date)->select('clientes.*',DB::raw('SUM(orders.total) as total'))->groupBy('clientes.id')->get();//sum('total');
+      //  dd($datos[0]->total);
+        if ($datos[0]->total>="5000000"){
+            //dd($datos[0]->total);
+            $config['content'] = "El cliente ".$datos[0]->username." " .$datos[0]->first_name." ".$datos[0]->last_name.", Supera el monto minimo de trasnsaciones mensuales son: ".$datos[0]->total;
+            $config['to'] = CRUDBooster::adminPath('notifications');
+            $config['id_cms_users'] = [CRUDBooster::myId()]; //This is an array of id users
+            CRUDBooster::sendNotification($config);
+        }
+
+
     }
 
     /*
@@ -344,19 +359,19 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         //Your code here
 
     }
-    public function getAdd() {
-        //Create an Auth
-        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
-            CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-        }
+    /* public function getAdd() {
+         //Create an Auth
+         if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
+             CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+         }
 
-        $data = [];
-        $data['page_title'] = 'Añadir Transacciones';
-        $this->data['return_url'] = 'erw';
+         $data = [];
+         $data['page_title'] = 'Añadir Transacciones';
+         $this->data['return_url'] = 'erw';
 
-        //Please use cbView method instead view method from laravel
-        $this->cbView('ordens',$data);
-    }
+         //Please use cbView method instead view method from laravel
+         $this->cbView('ordens',$data);
+     }*/
 
     //By the way, you can still create your own method in here... :)
 
