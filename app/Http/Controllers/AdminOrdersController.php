@@ -12,29 +12,30 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     public function cbInit()
     {
 
-        # START CONFIGURATION DO NOT REMOVE THIS LINE
-        $this->title_field = "id";
-        $this->limit = "20";
-        $this->orderby = "id,desc";
-        $this->global_privilege = false;
-        $this->button_table_action = true;
-        $this->button_bulk_action = true;
-        $this->button_action_style = "button_icon";
-        $this->button_add = true;
-        $this->button_edit = true;
-        $this->button_delete = true;
-        $this->button_detail = true;
-        $this->button_show = true;
-        $this->button_filter = true;
-        $this->button_import = false;
-        $this->button_export = false;
-        $this->table = "orders";
-        # END CONFIGURATION DO NOT REMOVE THIS LINE
+			# START CONFIGURATION DO NOT REMOVE THIS LINE
+			$this->title_field = "id";
+			$this->limit = "20";
+			$this->orderby = "id,desc";
+			$this->global_privilege = false;
+			$this->button_table_action = true;
+			$this->button_bulk_action = true;
+			$this->button_action_style = "button_icon";
+			$this->button_add = true;
+			$this->button_edit = true;
+			$this->button_delete = true;
+			$this->button_detail = true;
+			$this->button_show = true;
+			$this->button_filter = true;
+			$this->button_import = false;
+			$this->button_export = true;
+			$this->table = "orders";
+			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
-        # START COLUMNS DO NOT REMOVE THIS LINE
+			# START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
         $this->col[] = ["label" => "User", "name" => "user_id", "join" => "cms_users,name"];
         $this->col[] = ["label" => "Cliente", "name" => "cliente_id", "join" => "clientes,username"];
+        $this->col[] = ["label" => "tipo", "name" => "(SELECT franquicia.tarjeta FROM tarjetas JOIN franquicia ON franquicia.id = tarjetas.franquicia_id JOIN orders ord on ord.tarjeta_id= tarjetas.id where ord.id =orders.id) as tipo"];
         $this->col[] = ["label" => "Tarjeta", "name" => "tarjeta_id", "join" => "tarjetas,numero_tarj"];
         $this->col[] = ["label" => "Total", "name" => "total"];
         $this->col[] = ["label" => "Fecha", "name" => "created_at"];
@@ -42,20 +43,20 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-        $this->form[] = ['label' => 'User', 'name' => 'user_id', 'type' => 'hidden', 'value' => CRUDBooster::myId(), 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10', 'datatable' => 'cms_users,id'];
-        //$this->form[] = ['label'=>'Cliente','name'=>'cliente_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'clientes,id','datatable_format'=>'username,\' | \',name,\' | \',last_name'];
-        $this->form[] = ['label' => 'Cliente', 'name' => 'cliente_id', 'type' => 'datamodal', 'validation' => 'required|integer|min:0', 'datamodal_table' => 'clientes', 'datamodal_where' => '', 'datamodal_columns' => 'first_name,last_name,username', 'datamodal_select_to' => 'id:cliente_id'];
+        $this->form[] = ['label' => 'User', 'name' => 'user_id', 'type' => 'hidden', 'value' => CRUDBooster::myId(), 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+        $this->form[] = ['label' => 'Cliente', 'name' => 'cliente_id', 'type' => 'datamodal', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10', 'datamodal_table' => 'clientes', 'datamodal_columns' => 'first_name,last_name,username', 'datamodal_select_to' => 'id:cliente_id'];
         $this->form[] = ['label' => 'Tarjeta', 'name' => 'tarjeta_id', 'type' => 'select', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10', 'datatable' => 'tarjetas,numero_tarj', 'parent_select' => 'cliente_id'];
         $this->form[] = ['label' => 'Total', 'name' => 'total', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
         # END FORM DO NOT REMOVE THIS LINE
 
         # OLD START FORM
         //$this->form = [];
-        //$this->form[] = ["label"=>"User Id","name"=>"user_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"user,id"];
-        //$this->form[] = ["label"=>"Cliente Id","name"=>"cliente_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"cliente,id"];
-        //$this->form[] = ["label"=>"Tarjeta Id","name"=>"tarjeta_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"tarjeta,id"];
-        //$this->form[] = ["label"=>"Total","name"=>"total","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+        //$this->form[] = ['label'=>'User','name'=>'user_id','type'=>'hidden','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+        //$this->form[] = ['label'=>'Cliente','name'=>'cliente_id','type'=>'datamodal','validation'=>'required|integer|min:0','width'=>'col-sm-10','datamodal_table'=>'clientes','datamodal_columns'=>'first_name,last_name,username'];
+        //$this->form[] = ['label'=>'Tarjeta','name'=>'tarjeta_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'tarjetas,numero_tarj','parent_select'=>'cliente_id'];
+        //$this->form[] = ['label'=>'Total','name'=>'total','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
         # OLD END FORM
+
         $this->button_addmore = false;
         //Alert::warning('this is warning alert');
 
@@ -281,7 +282,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     /*
     | ----------------------------------------------------------------------
     | Hook for execute command after add public static function called
-    | ----------------------------------------------------------------------
+    | ----------------------------------------------3------------------------
     | @id = last insert id
     |
     */
@@ -290,15 +291,15 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         //dd($id);
         $carbon = new \Carbon\Carbon();
         $date = $carbon->now('America/Bogota');
-        $date=$date->format('m');
+        $date = $date->format('m');
         //dd($date);
-        $cliente=DB::table(orders)->where('id',$id)->get();
-       //  dd($cliente[0]->cliente_id);
-        $datos = DB::table(orders)->join('clientes','orders.cliente_id','=','clientes.id')->where('cliente_id', $cliente[0]->cliente_id)->whereMonth('orders.created_at',$date)->select('clientes.*',DB::raw('SUM(orders.total) as total'))->groupBy('clientes.id')->get();//sum('total');
-      //  dd($datos[0]->total);
-        if ($datos[0]->total>="5000000"){
+        $cliente = DB::table(orders)->where('id', $id)->get();
+        //  dd($cliente[0]->cliente_id);
+        $datos = DB::table(orders)->join('clientes', 'orders.cliente_id', '=', 'clientes.id')->where('cliente_id', $cliente[0]->cliente_id)->whereMonth('orders.created_at', $date)->select('clientes.*', DB::raw('SUM(orders.total) as total'))->groupBy('clientes.id')->get();//sum('total');
+        //  dd($datos[0]->total);
+        if ($datos[0]->total >= "5000000") {
             //dd($datos[0]->total);
-            $config['content'] = "El cliente ".$datos[0]->username." " .$datos[0]->first_name." ".$datos[0]->last_name.", Supera el monto minimo de trasnsaciones mensuales son: ".$datos[0]->total;
+            $config['content'] = "El cliente " . $datos[0]->username . " " . $datos[0]->first_name . " " . $datos[0]->last_name . ", Supera el monto minimo de trasnsaciones mensuales son: " . $datos[0]->total;
             $config['to'] = CRUDBooster::adminPath('notifications');
             $config['id_cms_users'] = [CRUDBooster::myId()]; //This is an array of id users
             CRUDBooster::sendNotification($config);
